@@ -5,11 +5,11 @@
 
 ## **main status**
 
-done
+coding
 
 ## **sub status**
 
-global-phase1-docs-aligned
+phase2-google-auth
 
 \*以下の編集を禁止する
 

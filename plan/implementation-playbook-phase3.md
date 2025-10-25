@@ -46,8 +46,8 @@
 
 ### フェーズ完了条件
 - [ ] 全18タスクが完了 (Task 3-4は削除済み)
-- [ ] `pnpm test` が成功
-- [ ] `pnpm tsx implementation/src/server.ts` が起動
+- [ ] `npm test` が成功
+- [ ] `npm exec tsx implementation/src/server.ts` が起動
 - [ ] OpenAI Realtime APIでg711_ulaw設定を確認
 - [ ] ngrok経由で実機電話テストが成功
 - [ ] `docs/notes/phase3.md` が作成され、共有済み
@@ -64,13 +64,13 @@ Twilio 050番号への実着信から OpenAI Realtime API 経由で音声会話�
 1. 実機電話着信 → AI音声応答 → Sheetsモック参照応答の一連フローが成功
 2. Twilio Webhook署名検証、Media Streams双方向中継（g711_ulaw直接転送）が動作
 3. OpenAI Realtime APIがg711_ulaw設定で正常動作
-4. `pnpm vitest run` が成功（Twilio署名検証のユニットテスト）
+4. `npm exec vitest run` が成功（Twilio署名検証のユニットテスト）
 5. `docs/notes/phase3.md` にフェーズ完了報告が記録されている
 
 ## 2. 技術仕様
 
 ### 使用ツール・ライブラリ
-- **HTTPサーバー**: Fastify v5（Phase1から継続）
+- **HTTPサーバー**: Fastify v5（Phase3で新規導入、v4は2025/6/30 EOL）
 - **WebSocket**: ws（Phase1から継続）
 - **OpenAI SDK**: openai v4.81.0+（Phase1から継続）
 - **Twilio**: twilio SDK（署名検証用）
@@ -250,7 +250,7 @@ describe('validateTwilioSignature', () => {
 
 **完了条件**:
 - `src/twilio/signature.test.ts` が作成されている
-- `pnpm vitest run implementation/src/twilio/signature.test.ts` が成功
+- `npm exec vitest run implementation/src/twilio/signature.test.ts` が成功
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
@@ -384,7 +384,7 @@ describe('Audio Converter', () => {
 
 ~~**完了条件**:~~
 ~~- `src/audio/converter.test.ts` が作成されている~~
-~~- `pnpm vitest run implementation/src/audio/converter.test.ts` が成功~~
+~~- `npm exec vitest run implementation/src/audio/converter.test.ts` が成功~~
 ~~- state.md が `done` に更新~~
 
 ~~**state.md遷移**: coding → pr_preparation → review → integration → done~~
@@ -613,7 +613,7 @@ describe('SheetsMockClient', () => {
 
 **完了条件**:
 - `src/google/sheetsMock.test.ts` が作成されている
-- `pnpm vitest run implementation/src/google/sheetsMock.test.ts` が成功
+- `npm exec vitest run implementation/src/google/sheetsMock.test.ts` が成功
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
@@ -813,7 +813,7 @@ describe('Twilio Controller', () => {
 
 **完了条件**:
 - `src/http/twilioController.test.ts` が作成されている
-- `pnpm vitest run implementation/src/http/twilioController.test.ts` が成功
+- `npm exec vitest run implementation/src/http/twilioController.test.ts` が成功
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
@@ -938,7 +938,7 @@ describe('VoiceGatewayOrchestrator', () => {
 
 **完了条件**:
 - `src/conversation/voiceGatewayOrchestrator.test.ts` が作成されている
-- `pnpm vitest run implementation/src/conversation/voiceGatewayOrchestrator.test.ts` が成功
+- `npm exec vitest run implementation/src/conversation/voiceGatewayOrchestrator.test.ts` が成功
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
@@ -1038,19 +1038,16 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# pnpmインストール
-RUN npm install -g pnpm@latest
-
 # 依存関係のインストール
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 
 # アプリケーションコピー
 COPY . .
 
 # TypeScriptビルド（本番用は事前ビルド推奨）
-RUN pnpm add -D typescript tsx
-RUN pnpm tsc
+RUN npm install --save-dev typescript tsx
+RUN npx tsc
 
 # ポート公開
 EXPOSE 3000 8080
@@ -1062,7 +1059,7 @@ CMD ["node", "dist/server.js"]
 **完了条件**:
 - `Dockerfile` が作成されている
 - Node.js 20ベース
-- pnpmで依存インストール
+- npmで依存インストール
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
@@ -1128,7 +1125,7 @@ describe('Twilio Call Integration (Manual)', () => {
     const config = loadConfig();
 
     // このテストは手動で実行
-    // 1. pnpm tsx implementation/src/server.ts を起動
+    // 1. npm exec tsx implementation/src/server.ts を起動
     // 2. ngrok start --all --config tools/ngrok-config.yml でトンネル開始
     // 3. TwilioコンソールでWebhook URLを設定
     // 4. Twilio番号に電話をかける
@@ -1176,7 +1173,7 @@ TWILIO_PHONE_NUMBER=<050_number>
 
 1. サーバー起動:
    ```bash
-   pnpm tsx implementation/src/server.ts
+   npm exec tsx implementation/src/server.ts
    ```
 
 2. ngrokトンネル起動:
@@ -1338,8 +1335,8 @@ Phase3 完了報告を作成:
 ## 5. フェーズ完了チェックリスト
 
 - [ ] 全20タスクが `done` ステータスに到達
-- [ ] `pnpm test` が成功
-- [ ] `pnpm tsx implementation/src/server.ts` が起動
+- [ ] `npm test` が成功
+- [ ] `npm exec tsx implementation/src/server.ts` が起動
 - [ ] ngrok経由で実機電話テストが成功
 - [ ] `docs/notes/phase3.md` が作成され、Slack #restaurant-voice-ai-dev に共有
 - [ ] 全PRがレビュー承認済み・マージ済み

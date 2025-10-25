@@ -11,15 +11,33 @@ project:
 technology_stack:
   primary_choice: TypeScript + Node.js 20 LTS
   alternative: Python 3.11+ FastAPI
+  package_manager: npm (Node.js 20同梱)
 
   if_typescript:
-    http_server: Fastify v5 (v4は2025年6月30日EOL)
+    # Core frameworks
+    http_server: Fastify v5 (v4は2025年6月30日EOL、Phase3以降で使用)
     websocket: ws
+
+    # OpenAI & Google
     openai_sdk: openai v4.81.0+ (import { OpenAIRealtimeWS } from 'openai/beta/realtime/websocket')
-    google_sdk: googleapis
+    google_sdk: googleapis (Phase2以降で使用)
+
+    # Utilities
     retry: p-retry
-    test: vitest or jest
+    validation: zod
+    env: dotenv
+    cli: commander
+
+    # Testing & Logging
+    test: vitest
     logging: pino
+
+    # Development
+    dev_runtime: tsx
+
+    # Audio I/O (Phase1)
+    audio_input: sox (child_process経由)
+    audio_output: speaker
 
   if_python:
     http_server: FastAPI v0.119.1+

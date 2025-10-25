@@ -32,10 +32,10 @@
 
 ### フェーズ完了条件
 - [ ] 全12タスクが `done` ステータスに到達
-- [ ] `pnpm test` が成功
-- [ ] `pnpm tsx implementation/scripts/test-sheets-write.ts` が成功（実Sheets書き込み）
-- [ ] `pnpm tsx implementation/scripts/test-sheets-read.ts` が成功（実Sheets読み込み）
-- [ ] `pnpm vitest run implementation/tests/integration/sheets-api.test.ts` が成功
+- [ ] `npm test` が成功
+- [ ] `npm exec tsx implementation/scripts/test-sheets-write.ts` が成功（実Sheets書き込み）
+- [ ] `npm exec tsx implementation/scripts/test-sheets-read.ts` が成功（実Sheets読み込み）
+- [ ] `npm exec vitest run implementation/tests/integration/sheets-api.test.ts` が成功
 - [ ] `docs/notes/phase2.md` が作成され、共有済み
 - [ ] 全PRがレビュー承認済み・マージ済み
 
@@ -49,7 +49,7 @@ Google Sheets API へ予約データを書き込み、既存予約を読み取�
 ### 完了条件
 1. 固定予約データをSheets APIで書き込み・読み込みが成功
 2. 429エラー発生時に指数バックオフでリトライする
-3. `pnpm vitest run` が成功（Sheets APIモックテスト + 実API統合テスト）
+3. `npm exec vitest run` が成功（Sheets APIモックテスト + 実API統合テスト）
 4. `docs/notes/phase2.md` にフェーズ完了報告が記録されている
 
 ## 2. 技術仕様
@@ -201,7 +201,7 @@ describe('getAuthClient', () => {
 
 **完了条件**:
 - `src/google/auth.test.ts` が作成されている
-- `pnpm vitest run implementation/src/google/auth.test.ts` が成功
+- `npm exec vitest run implementation/src/google/auth.test.ts` が成功
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
@@ -394,7 +394,7 @@ describe('SheetsClient', () => {
 
 **完了条件**:
 - `src/google/sheets.test.ts` が作成されている
-- `pnpm vitest run implementation/src/google/sheets.test.ts` が成功
+- `npm exec vitest run implementation/src/google/sheets.test.ts` が成功
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
@@ -515,7 +515,7 @@ describe('mapToReservation', () => {
 
 **完了条件**:
 - `src/conversation/reservationMapper.test.ts` が作成されている
-- `pnpm vitest run implementation/src/conversation/reservationMapper.test.ts` が成功
+- `npm exec vitest run implementation/src/conversation/reservationMapper.test.ts` が成功
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
@@ -567,7 +567,7 @@ client
 
 **完了条件**:
 - `scripts/test-sheets-write.ts` が作成されている
-- `pnpm tsx implementation/scripts/test-sheets-write.ts` で実Sheetsに書き込み成功
+- `npm exec tsx implementation/scripts/test-sheets-write.ts` で実Sheetsに書き込み成功
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
@@ -603,7 +603,7 @@ client
 
 **完了条件**:
 - `scripts/test-sheets-read.ts` が作成されている
-- `pnpm tsx implementation/scripts/test-sheets-read.ts` で実Sheetsから読み込み成功
+- `npm exec tsx implementation/scripts/test-sheets-read.ts` で実Sheetsから読み込み成功
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
@@ -662,7 +662,7 @@ describe('Sheets API Integration', () => {
 
 **完了条件**:
 - `tests/integration/sheets-api.test.ts` が作成されている
-- `pnpm vitest run implementation/tests/integration/sheets-api.test.ts` が成功（実Sheets使用）
+- `npm exec vitest run implementation/tests/integration/sheets-api.test.ts` が成功（実Sheets使用）
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
@@ -700,17 +700,17 @@ GOOGLE_SHEET_ID=<spreadsheet_id>
 
 ```bash
 # 書き込みテスト
-pnpm tsx implementation/scripts/test-sheets-write.ts
+npm exec tsx implementation/scripts/test-sheets-write.ts
 
 # 読み込みテスト
-pnpm tsx implementation/scripts/test-sheets-read.ts
+npm exec tsx implementation/scripts/test-sheets-read.ts
 ```
 
 ### 統合テスト
 
 ```bash
 # Sheets API統合テスト（実APIを使用）
-pnpm vitest run implementation/tests/integration/sheets-api.test.ts
+npm exec vitest run implementation/tests/integration/sheets-api.test.ts
 ```
 ```
 
@@ -862,10 +862,10 @@ Phase2 完了報告を作成:
 ## 5. フェーズ完了チェックリスト
 
 - [ ] 全12タスクが `done` ステータスに到達
-- [ ] `pnpm test` が成功
-- [ ] `pnpm tsx implementation/scripts/test-sheets-write.ts` が成功（実Sheets書き込み）
-- [ ] `pnpm tsx implementation/scripts/test-sheets-read.ts` が成功（実Sheets読み込み）
-- [ ] `pnpm vitest run implementation/tests/integration/sheets-api.test.ts` が成功
+- [ ] `npm test` が成功
+- [ ] `npm exec tsx implementation/scripts/test-sheets-write.ts` が成功（実Sheets書き込み）
+- [ ] `npm exec tsx implementation/scripts/test-sheets-read.ts` が成功（実Sheets読み込み）
+- [ ] `npm exec vitest run implementation/tests/integration/sheets-api.test.ts` が成功
 - [ ] `docs/notes/phase2.md` が作成され、Slack #restaurant-voice-ai-dev に共有
 - [ ] 全PRがレビュー承認済み・マージ済み
 

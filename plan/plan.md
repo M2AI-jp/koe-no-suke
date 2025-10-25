@@ -18,14 +18,16 @@
 
 | 用途 / フェーズ | ライブラリ / ツール | 対象フェーズ | 備考 |
 |----------------|---------------------|--------------|------|
-| ランタイム | Node.js 20 LTS + TypeScript 5.x | 全フェーズ | `pnpm` を標準パッケージマネージャーとして使用 |
+| ランタイム | Node.js 20 LTS + TypeScript 5.x | 全フェーズ | `npm` を標準パッケージマネージャーとして使用（Node.js 20同梱） |
 | CLI実装 | commander, tsx | Phase1 | ローカル音声検証用のCLIエントリーポイントを提供 |
 | 音声I/O | sox, speaker, 自前フェイク実装 | Phase1 | ローカル検証・dry-runに対応 |
 | OpenAI SDK | openai v4.81.0+ (`openai/beta/realtime/ws`) | 全フェーズ | g711_ulaw対応のRealtime APIを利用 |
+| 環境変数 | dotenv | 全フェーズ | .envファイルからの環境変数読み込み |
+| スキーマ検証 | zod | 全フェーズ | 環境変数・データ型の実行時検証 |
 | ログ | pino | 全フェーズ | JSON構造化ログを標準化 |
 | テスト | vitest | 全フェーズ | 単体・統合テストに共通利用 |
 | HTTPサーバー | Fastify v5 | Phase3以降 | Twilio WebhookおよびCloud Run向けサーバー実装で採用 |
-| WebSocket | ws | Phase3以降 | Twilio Media Streams ⇄ Realtime APIブリッジ |
+| WebSocket | ws | Phase3以降 | Twilio Media Streams ⇄ Realtime APIブリッジ（Phase1ではOpenAI SDK内部で使用） |
 | 永続化 | googleapis + google-auth-library | Phase2以降 | Google Sheets サービスアカウント連携 |
 | リトライ | p-retry | Phase1以降 | OpenAI/Google API呼び出しのバックオフ制御 |
 

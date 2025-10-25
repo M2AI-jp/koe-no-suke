@@ -82,7 +82,8 @@
 - **スキーマ検証**: zod
 
 ### OpenAI Realtime API 仕様
-- **モデル**: `gpt-4o-realtime-preview-2024-12-17`
+- **モデル**: `gpt-realtime-2025-08-28` (GA版)
+- **旧モデル**: `gpt-4o-realtime-preview-2024-12-17` (非推奨)
 - **音声フォーマット**: PCM16 24kHz, 16-bit, mono (ローカル環境)
 - **レイテンシー**: 200ms以下
 - **機能**: Speech-to-Speech, Server VAD, 文字起こし (Whisper-1), 割り込み処理
