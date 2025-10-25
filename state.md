@@ -5,11 +5,11 @@
 
 ## **main status**
 
-review
+done
 
 ## **sub status**
 
-playbook-spec-updates-pr-created
+global-playbook-specs-merged
 
 \*以下の編集を禁止する
 
