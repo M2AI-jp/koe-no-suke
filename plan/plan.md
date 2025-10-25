@@ -1,6 +1,6 @@
 # restaurant-voice-ai 実装計画
 
-**最終更新**: 2025-01-24（公式ドキュメント検証済み）
+**最終更新**: 2025-10-25（公式ドキュメント検証済み）
 
 ## プロジェクト概要
 
@@ -14,35 +14,24 @@
 
 ## 技術スタック選択
 
-### Option A: TypeScript + Node.js 20 LTS（推奨）
+### 採用技術（確定）
 
-**理由**: 型安全性、OpenAI/Twilio公式サンプル豊富、テスト・モック容易
+| 用途 / フェーズ | ライブラリ / ツール | 対象フェーズ | 備考 |
+|----------------|---------------------|--------------|------|
+| ランタイム | Node.js 20 LTS + TypeScript 5.x | 全フェーズ | `pnpm` を標準パッケージマネージャーとして使用 |
+| CLI実装 | commander, tsx | Phase1 | ローカル音声検証用のCLIエントリーポイントを提供 |
+| 音声I/O | sox, speaker, 自前フェイク実装 | Phase1 | ローカル検証・dry-runに対応 |
+| OpenAI SDK | openai v4.81.0+ (`openai/beta/realtime/ws`) | 全フェーズ | g711_ulaw対応のRealtime APIを利用 |
+| ログ | pino | 全フェーズ | JSON構造化ログを標準化 |
+| テスト | vitest | 全フェーズ | 単体・統合テストに共通利用 |
+| HTTPサーバー | Fastify v5 | Phase3以降 | Twilio WebhookおよびCloud Run向けサーバー実装で採用 |
+| WebSocket | ws | Phase3以降 | Twilio Media Streams ⇄ Realtime APIブリッジ |
+| 永続化 | googleapis + google-auth-library | Phase2以降 | Google Sheets サービスアカウント連携 |
+| リトライ | p-retry | Phase1以降 | OpenAI/Google API呼び出しのバックオフ制御 |
 
-| 用途 | ライブラリ | バージョン | 備考 |
-|------|-----------|-----------|------|
-| HTTPサーバー | Fastify | v5推奨 | v4は2025/6/30 EOL |
-| WebSocket | ws | latest | Twilio ⇄ OpenAI双方向ブリッジ |
-| OpenAI SDK | openai | v4.81.0+ | `import { OpenAIRealtimeWS } from 'openai/beta/realtime/websocket'` |
-| Google Sheets | googleapis | latest | サービスアカウント認証 |
-| リトライ | p-retry | latest | 指数バックオフ |
-| テスト | vitest/jest | latest | 単体・統合テスト |
-| ログ | pino | latest | JSON構造化ログ |
+### 代替案（検討履歴）
 
-### Option B: Python 3.11+ FastAPI
-
-**理由**: 非同期処理標準、pytest強力、AI/ML系ライブラリ豊富
-
-| 用途 | ライブラリ | バージョン | 備考 |
-|------|-----------|-----------|------|
-| HTTPサーバー | FastAPI | v0.119.1+ | Python 3.11/3.12/3.13対応 |
-| WebSocket | FastAPI WebSocket / websockets | latest | |
-| OpenAI SDK | openai | v1.x | |
-| Google Sheets | google-auth + google-api-python-client | latest | |
-| リトライ | tenacity | latest | 指数バックオフ |
-| テスト | pytest + pytest-asyncio | latest | |
-| ログ | structlog | latest | JSON構造化ログ |
-
-**決定タイミング**: Phase 0（環境セットアップ時）
+Phase0 で Python + FastAPI 構成も検討したが、既存資産とNode.js実装の親和性から採用を見送った。必要に応じて将来の比較検討資料として残す。
 
 ---
 
