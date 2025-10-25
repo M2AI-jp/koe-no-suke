@@ -9,7 +9,7 @@ done
 
 ## **sub status**
 
-global-playbook-specs-merged
+global-phase1-docs-aligned
 
 \*以下の編集を禁止する
 
