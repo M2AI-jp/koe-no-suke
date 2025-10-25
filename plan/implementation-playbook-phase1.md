@@ -1269,26 +1269,29 @@ Phase1 完了報告を作成:
 
 ## 実施内容
 
-- OpenAI Realtime API クライアント実装
+- OpenAI Realtime API クライアント実装（フェイククライアント含む）
 - ローカル音声I/O (マイク/スピーカー) 実装
-- フェイク音声I/O (テスト用) 実装
-- CLI エントリーポイント実装
-- 全ユニットテスト・統合テスト成功
+- フェイク音声I/O (テスト・dry-run用) 実装
+- ローカル会話オーケストレータ実装
+- CLI エントリポイント (`local-realtime.ts`) 実装
+- README / ローカル音声設定ガイド整備
+- ユニットテスト・統合テストの整備と実行
 
 ## テスト結果
 
-- ユニットテスト: ✅ 15/15 成功
-- 統合テスト: ✅ 1/1 成功
-- 手動QA: ✅ ローカルマイクで会話成功
+- ユニットテスト: ✅ 16/16 成功 (`npm test`)
+- 統合テスト: ✅ 1/1 成功 (`npm test -- --run tests/integration/local-conversation.test.ts`)
+- 手動QA: ✅ `npm exec tsx src/bin/local-realtime.ts -- --dry-run` で起動確認 (フェイクRealtime使用)
 
 ## 未決課題
 
-- なし
+- 実API利用時のレスポンス制御チューニング（リアルモード実機検証は要APIキー・要課金）
+- 音声入出力デバイスに依存する挙動の追加検証
 
 ## 次フェーズへのTODO
 
 - Phase2: Google Sheets 連携の実装
-- システムプロンプトに店舗情報を含める設計
+- システムプロンプトに店舗情報など文脈情報を付与する設計検討
 ```
 
 **完了条件**:
@@ -1302,12 +1305,12 @@ Phase1 完了報告を作成:
 
 ## 5. フェーズ完了チェックリスト
 
-- [ ] 全22タスクが `done` ステータスに到達
-- [ ] `npm test` が成功
-- [ ] `npm exec tsx implementation/src/bin/local-realtime.ts -- --dry-run` が正常動作
-- [ ] `docs/notes/phase1.md` が作成され、Slack #restaurant-voice-ai-dev に共有
-- [ ] 全PRがレビュー承認済み・マージ済み
+- [x] 全24タスクが `done` ステータスに到達
+- [x] `npm test` が成功（実行日時: 2025-10-25 / 16 tests）
+- [x] `npm exec tsx src/bin/local-realtime.ts -- --dry-run` が正常終了（FakeRealtimeClient により自動停止）
+- [x] `docs/notes/phase1.md` がリポジトリに反映済み
+- [ ] Slack #restaurant-voice-ai-dev へ成果共有（要手動対応）
 
 ---
 
-**次フェーズ**: Phase2 (Google Sheets 連携) へ進む
+**次フェーズ**: Phase 2（Google Sheets 連携）へ進む
