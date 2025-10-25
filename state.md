@@ -5,11 +5,11 @@
 
 ## **main status**
 
-coding
+review
 
 ## **sub status**
 
-phase2-google-auth
+phase2-folder-sync
 
 \*以下の編集を禁止する
 

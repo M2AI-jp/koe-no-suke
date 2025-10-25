@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createTestLogger } from '../../tests/helpers/testLogger';
 
 const writeMock = vi.fn();
 const endMock = vi.fn();
@@ -9,12 +10,6 @@ vi.mock('speaker', () => ({
     end: endMock,
   })),
 }));
-
-const createTestLogger = async () => {
-  vi.stubEnv('OPENAI_API_KEY', 'test-key');
-  const { createLogger } = await import('../logger');
-  return createLogger('test');
-};
 
 beforeEach(() => {
   writeMock.mockClear();

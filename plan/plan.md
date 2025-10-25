@@ -135,6 +135,10 @@ Phase0 で Python + FastAPI 構成も検討したが、既存資産とNode.js実
 - **モック**: OpenAI、Twilio
 - **目標**: レート制限・リトライロジック確認
 - **成功基準**: データ追加成功、指数バックオフ動作、429エラー処理
+- **前提Ops**:
+  - GCPで Google Sheets / Drive API を有効化し、サービスアカウント権限を確認済み
+  - サービスアカウント鍵を発行し `.env.local` の `GOOGLE_SA_KEY` に一行JSONで登録、原本は削除
+  - 顧客用シート格納フォルダID（`1v2M_XZKEKhczHzJ17KK9S2K9VAsY8QeT`）を `GOOGLE_SHEET_PARENT_FOLDER_ID` として設定し、Provisioner で生成したシート ID を `GOOGLE_SHEET_ID` に保存
 
 ### Phase 3: Twilio統合（2-3週間）
 - **実サービス**: Twilio、OpenAI

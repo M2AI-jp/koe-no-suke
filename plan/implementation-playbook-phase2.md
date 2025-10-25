@@ -7,36 +7,51 @@
 ### タスク進捗チェックリスト
 
 #### Google認証（Task 1-2）
-- [ ] Task 1: src/google/auth.ts 作成
-- [ ] Task 2: src/google/auth.test.ts 作成
+- [x] Task 1: src/google/auth.ts 作成
+- [x] Task 2: src/google/auth.test.ts 作成
 
 #### Sheetsクライアント（Task 3-4）
-- [ ] Task 3: src/google/sheets.ts 作成
-- [ ] Task 4: src/google/sheets.test.ts 作成
+- [x] Task 3: src/google/sheets.ts 作成
+- [x] Task 4: src/google/sheets.test.ts 作成
 
 #### 予約データマッピング（Task 5-6）
-- [ ] Task 5: src/conversation/reservationMapper.ts 作成
-- [ ] Task 6: src/conversation/reservationMapper.test.ts 作成
+- [x] Task 5: src/conversation/reservationMapper.ts 作成
+- [x] Task 6: src/conversation/reservationMapper.test.ts 作成
 
-#### テストスクリプト（Task 7-8）
-- [ ] Task 7: scripts/test-sheets-write.ts 作成
-- [ ] Task 8: scripts/test-sheets-read.ts 作成
+#### GCP セットアップ（Ops Task A-C）
+- [x] Ops Task A: Google Sheets / Drive API 有効化 & サービスアカウント権限確認
+- [x] Ops Task B: サービスアカウント鍵作成・`GOOGLE_SA_KEY` を `.env.local` へ安全保存
+- [x] Ops Task C: スプレッドシート格納フォルダID（`GOOGLE_SHEET_PARENT_FOLDER_ID`）設定 & ダウンロード鍵のサニタイズ
 
-#### 統合テスト（Task 9）
-- [ ] Task 9: tests/integration/sheets-api.test.ts 作成
+#### シートプロビジョニング（Task 7-9）
+- [x] Task 7: src/google/sheetsProvisioner.ts 作成
+- [x] Task 8: src/google/sheetsProvisioner.test.ts 作成
+- [x] Task 9: scripts/create-customer-sheet.ts 作成
 
-#### ドキュメント（Task 10-12）
-- [ ] Task 10: README.md 更新
-- [ ] Task 11: docs/howto/google-sheets-setup.md 作成
-- [ ] Task 12: docs/notes/phase2.md 作成
+#### 顧客管理（Task 10-11）
+- [x] Task 10: ops/customers/customers.json 作成（顧客IDとシートIDの対応管理）
+- [x] Task 11: ops/customers/provision-customers.ts 作成（顧客一括生成・ID追記）
+
+#### テストスクリプト（Task 10-11）
+- [x] Task 12: scripts/test-sheets-write.ts 作成
+- [x] Task 13: scripts/test-sheets-read.ts 作成
+
+#### 統合テスト（Task 12）
+- [x] Task 14: tests/integration/sheets-api.test.ts 作成
+
+#### ドキュメント（Task 13-15）
+- [x] Task 15: README.md 更新
+- [x] Task 16: docs/howto/google-sheets-setup.md 作成
+- [x] Task 17: docs/notes/phase2.md 作成
 
 ### フェーズ完了条件
-- [ ] 全12タスクが `done` ステータスに到達
-- [ ] `npm test` が成功
-- [ ] `npm exec tsx implementation/scripts/test-sheets-write.ts` が成功（実Sheets書き込み）
-- [ ] `npm exec tsx implementation/scripts/test-sheets-read.ts` が成功（実Sheets読み込み）
-- [ ] `npm exec vitest run implementation/tests/integration/sheets-api.test.ts` が成功
-- [ ] `docs/notes/phase2.md` が作成され、共有済み
+- [x] 全17タスクが `done` ステータスに到達
+- [x] `npm test` が成功
+- [x] `npm exec tsx implementation/scripts/create-customer-sheet.ts -- --name Sample --customer-id sample` が成功（シート自動生成）
+- [x] `npm exec tsx implementation/scripts/test-sheets-write.ts` が成功（実Sheets書き込み）
+- [x] `npm exec tsx implementation/scripts/test-sheets-read.ts` が成功（実Sheets読み込み）
+- [x] `npm exec vitest run implementation/tests/integration/sheets-api.test.ts` が成功
+- [x] `docs/notes/phase2.md` が作成され、共有済み
 - [ ] 全PRがレビュー承認済み・マージ済み
 
 ---
@@ -101,20 +116,72 @@ Task 5 (conversation/reservationMapper.ts) ← なし
   ↓
 Task 6 (conversation/reservationMapper.test.ts) ← Task 5
   ↓
-Task 7 (scripts/test-sheets-write.ts) ← Task 3, Task 5
+Task 7 (google/sheetsProvisioner.ts) ← Task 3, Ops Task C
   ↓
-Task 8 (scripts/test-sheets-read.ts) ← Task 3
+Task 8 (google/sheetsProvisioner.test.ts) ← Task 7
   ↓
-Task 9 (tests/integration/sheets-api.test.ts) ← Task 3, Task 5
+Task 9 (scripts/create-customer-sheet.ts) ← Task 7
   ↓
-Task 10 (README.md更新) ← Task 7, Task 8
+Task 10 (scripts/test-sheets-write.ts) ← Task 3, Task 5, Task 7
   ↓
-Task 11 (docs/howto/google-sheets-setup.md) ← Task 1
+Task 11 (scripts/test-sheets-read.ts) ← Task 3, Task 7
   ↓
-Task 12 (docs/notes/phase2.md) ← Task 9
+Task 12 (tests/integration/sheets-api.test.ts) ← Task 3, Task 5, Task 7
+  ↓
+Task 13 (README.md更新) ← Task 10, Task 11
+  ↓
+Task 14 (docs/howto/google-sheets-setup.md) ← Task 1, Task 7
+  ↓
+Task 15 (docs/notes/phase2.md) ← Task 12
 ```
 
 ## 4. タスク詳細
+
+### Ops Task A: Google Sheets / Drive API 有効化 & 権限確認
+
+**前提タスク**: なし  
+**対象**: GCP プロジェクト `i-academy-476206-t0`  
+**作業内容**:
+- Google Cloud コンソールで対象プロジェクトを選択
+- `API とサービス > ライブラリ` から Google Sheets API / Google Drive API を有効化
+- IAM ロールに `roles/iam.serviceAccountKeyAdmin` 等、必要権限が付与されていることを確認
+
+**完了条件**:
+- 両 API が有効化確認済み
+- サービスアカウント操作に必要な IAM 権限が揃っている
+
+---
+
+### Ops Task B: サービスアカウント鍵作成・環境ファイルへの格納
+
+**前提タスク**: Ops Task A  
+**対象ファイル**: `implementation/.env.local`  
+**作業内容**:
+- gcloud CLI でサービスアカウント鍵を有効化（`gcloud iam service-accounts keys enable`）
+- 取得した JSON を 1 行化し、`GOOGLE_SA_KEY` として `.env.local` に保存
+- 同時に Secret Manager 登録を想定し、鍵ファイルをローカルから削除
+
+**完了条件**:
+- `implementation/.env.local` に `GOOGLE_SA_KEY` が設定済み
+- ダウンロードフォルダ等に鍵が残存していない
+
+---
+
+### Ops Task C: スプレッドシート保存先フォルダID設定
+
+**前提タスク**: Ops Task B  
+**対象ファイル**: `implementation/.env.local`  
+**作業内容**:
+- Google Drive 上で保存先フォルダ（`1v2M_XZKEKhczHzJ17KK9S2K9VAsY8QeT`）を決定
+- `.env.local` の `GOOGLE_SHEET_PARENT_FOLDER_ID` にフォルダ ID を設定
+- 既存シート ID (`GOOGLE_SHEET_ID`) は暫定で空にしておき、プロビジョニング後に設定する方針を共有
+- 将来の自動シート生成で利用するため、フォルダ共有設定（サービスアカウントへのアクセス）を確認
+
+**完了条件**:
+- `GOOGLE_SHEET_PARENT_FOLDER_ID` がフォルダ ID で更新済み
+- サービスアカウントが当該フォルダへ書き込み可能
+
+---
 
 ### Task 1: src/google/auth.ts 作成
 
@@ -163,7 +230,9 @@ export function getSheetsClient() {
 **備考**: `.env.template` に以下を追記:
 ```text
 GOOGLE_SA_KEY=
+GOOGLE_SHEET_PARENT_FOLDER_ID=
 GOOGLE_SHEET_ID=
+GOOGLE_TEMPLATE_SHEET_ID=
 ```
 
 ---
@@ -522,210 +591,255 @@ describe('mapToReservation', () => {
 
 ---
 
-### Task 7: scripts/test-sheets-write.ts 作成
+### Task 7: src/google/sheetsProvisioner.ts 作成
 
-**前提タスク**: Task 3, Task 5
-**対象ファイル**: `implementation/scripts/test-sheets-write.ts`
-**作業内容**:
-Sheets書き込みテストスクリプトを作成:
+**前提タスク**: Task 3, Ops Task C  
+**対象ファイル**: `implementation/src/google/sheetsProvisioner.ts`  
+**作業内容**:  
+- Drive API / Sheets API を用いて新規スプレッドシートを自動作成するクラスを実装
+- `config.ts` を拡張し、`GOOGLE_SHEET_PARENT_FOLDER_ID` と（必要なら）`GOOGLE_TEMPLATE_SHEET_ID` を読み込む
+- `auth.ts` に Drive クライアント (`getDriveClient`) を追加し、サービスアカウント認証を再利用:
 ```typescript
-#!/usr/bin/env tsx
-import { SheetsClient } from '../src/google/sheets';
-import { mapToReservation } from '../src/conversation/reservationMapper';
-import { createLogger } from '../src/logger';
+import { drive_v3, sheets_v4 } from 'googleapis';
+import { getSheetsClient, getDriveClient } from './auth';
 
-const logger = createLogger('test-sheets-write');
-const client = new SheetsClient(logger);
-
-const rawData = {
-  date: '2025-01-25',
-  time: '18:00',
-  party_size: 4,
-  customer_name: 'テスト太郎',
-  contact_number: '+819012345678',
-  special_request: 'テストデータ',
+type ProvisionerOptions = {
+  parentFolderId?: string;
+  templateSheetId?: string;
+  drive?: drive_v3.Drive;
+  sheets?: sheets_v4.Sheets;
 };
 
-const result = mapToReservation(rawData, '+819012345678');
+export class SheetsProvisioner {
+  constructor(private readonly options: ProvisionerOptions = {}) {}
 
-if (!result.success) {
-  logger.error({ missingFields: result.missingFields }, 'Mapping failed');
-  process.exit(1);
+  private get drive(): drive_v3.Drive {
+    return this.options.drive ?? getDriveClient();
+  }
+
+  private get sheets(): sheets_v4.Sheets {
+    return this.options.sheets ?? getSheetsClient();
+  }
+
+  async createSpreadsheet(name: string): Promise<{ spreadsheetId: string; url: string }> {
+    if (this.options.templateSheetId) {
+      const response = await this.drive.files.copy({
+        fileId: this.options.templateSheetId,
+        requestBody: {
+          name,
+          parents: this.options.parentFolderId ? [this.options.parentFolderId] : undefined,
+        },
+        fields: 'id, webViewLink',
+      });
+      return { spreadsheetId: response.data.id!, url: response.data.webViewLink! };
+    }
+
+    const response = await this.sheets.spreadsheets.create({
+      requestBody: {
+        properties: { title: name },
+      },
+    });
+
+    if (this.options.parentFolderId && response.data.spreadsheetId) {
+      await this.drive.files.update({
+        fileId: response.data.spreadsheetId,
+        addParents: this.options.parentFolderId,
+        fields: 'id',
+      });
+    }
+
+    return {
+      spreadsheetId: response.data.spreadsheetId!,
+      url: response.data.spreadsheetUrl!,
+    };
+  }
 }
-
-client
-  .appendReservation(result.reservation!)
-  .then(() => {
-    logger.info('Test reservation written successfully');
-    process.exit(0);
-  })
-  .catch((error) => {
-    logger.error(error, 'Failed to write test reservation');
-    process.exit(1);
-  });
 ```
 
 **完了条件**:
-- `scripts/test-sheets-write.ts` が作成されている
-- `npm exec tsx implementation/scripts/test-sheets-write.ts` で実Sheetsに書き込み成功
+- `src/google/sheetsProvisioner.ts` が作成されている
+- フォルダ ID / テンプレート ID を指定して新規シートを生成できる
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
 
 ---
 
-### Task 8: scripts/test-sheets-read.ts 作成
+### Task 8: src/google/sheetsProvisioner.test.ts 作成
 
-**前提タスク**: Task 3
-**対象ファイル**: `implementation/scripts/test-sheets-read.ts`
-**作業内容**:
-Sheets読み込みテストスクリプトを作成:
+**前提タスク**: Task 7  
+**対象ファイル**: `implementation/src/google/sheetsProvisioner.test.ts`  
+**作業内容**:  
+`googleapis` をモックし、以下のケースを検証:
+- テンプレート ID なし → `spreadsheets.create` が呼ばれ、`files.update` でフォルダへ移動
+- テンプレート ID あり → `drive.files.copy` により複製される
+- 返却値に `spreadsheetId` と `url` が含まれる
+
+**完了条件**:
+- `src/google/sheetsProvisioner.test.ts` が作成されている
+- `npm exec vitest run implementation/src/google/sheetsProvisioner.test.ts` が成功
+- state.md が `done` に更新
+
+**state.md遷移**: coding → pr_preparation → review → integration → done
+
+---
+
+### Task 9: scripts/create-customer-sheet.ts 作成
+
+**前提タスク**: Task 7  
+**対象ファイル**: `implementation/scripts/create-customer-sheet.ts`  
+**作業内容**:  
+CLI から顧客 ID / 表示名 / 共有先メールアドレスを受け取り、スプレッドシートを生成して共有するスクリプトを実装:
 ```typescript
 #!/usr/bin/env tsx
-import { SheetsClient } from '../src/google/sheets';
+import { Command } from 'commander';
 import { createLogger } from '../src/logger';
+import { SheetsProvisioner } from '../src/google/sheetsProvisioner';
+import { getDriveClient } from '../src/google/auth';
+import { loadConfig } from '../src/config';
 
-const logger = createLogger('test-sheets-read');
-const client = new SheetsClient(logger);
+const program = new Command();
+program
+  .requiredOption('--name <name>', 'Spreadsheet display name')
+  .requiredOption('--customer-id <id>', 'Unique customer identifier')
+  .option('--share <email...>', 'Emails to grant edit access');
+program.parse();
 
-client
-  .listReservations()
-  .then((reservations) => {
-    logger.info({ count: reservations.length }, 'Reservations retrieved');
-    console.log(JSON.stringify(reservations, null, 2));
-    process.exit(0);
-  })
-  .catch((error) => {
-    logger.error(error, 'Failed to read reservations');
-    process.exit(1);
-  });
-```
+const options = program.opts<{
+  name: string;
+  customerId: string;
+  share?: string[];
+}>();
 
-**完了条件**:
-- `scripts/test-sheets-read.ts` が作成されている
-- `npm exec tsx implementation/scripts/test-sheets-read.ts` で実Sheetsから読み込み成功
-- state.md が `done` に更新
+const logger = createLogger('create-customer-sheet');
+const config = loadConfig();
 
-**state.md遷移**: coding → pr_preparation → review → integration → done
+async function main() {
+    const provisioner = new SheetsProvisioner({
+      parentFolderId: config.GOOGLE_SHEET_PARENT_FOLDER_ID,
+      templateSheetId: config.GOOGLE_TEMPLATE_SHEET_ID,
+    });
+    const { spreadsheetId, url } = await provisioner.createSpreadsheet(options.name);
 
----
+    if (options.share?.length) {
+      const drive = getDriveClient();
+      await Promise.all(
+        options.share.map((email) =>
+          drive.permissions.create({
+            fileId: spreadsheetId,
+            sendNotificationEmail: false,
+            requestBody: {
+              emailAddress: email,
+              role: 'writer',
+              type: 'user',
+            },
+          })
+        )
+      );
+    }
 
-### Task 9: tests/integration/sheets-api.test.ts 作成
+    logger.info({ customerId: options.customerId, spreadsheetId, url }, 'Sheet provisioned');
+    console.log(JSON.stringify({ customerId: options.customerId, spreadsheetId, url }, null, 2));
+}
 
-**前提タスク**: Task 3, Task 5
-**対象ファイル**: `implementation/tests/integration/sheets-api.test.ts`
-**作業内容**:
-Sheets API統合テストを実装（実APIを使用）:
-```typescript
-import { describe, it, expect } from 'vitest';
-import { SheetsClient } from '../../src/google/sheets';
-import { mapToReservation } from '../../src/conversation/reservationMapper';
-import { createLogger } from '../../src/logger';
-
-describe('Sheets API Integration', () => {
-  it('予約の書き込み・読み込みが成功', async () => {
-    const logger = createLogger('integration-test');
-    const client = new SheetsClient(logger);
-
-    // 書き込み
-    const rawData = {
-      date: '2025-01-25',
-      time: '18:00',
-      party_size: 4,
-      customer_name: 'Integration Test',
-      contact_number: '+819012345678',
-    };
-
-    const result = mapToReservation(rawData, '+819012345678');
-    expect(result.success).toBe(true);
-
-    await client.appendReservation(result.reservation!);
-
-    // 読み込み
-    const reservations = await client.listReservations();
-    const found = reservations.find((r) => r.customer_name === 'Integration Test');
-
-    expect(found).toBeDefined();
-    expect(found?.reservation_date).toBe('2025-01-25');
-  }, 10000); // 10秒タイムアウト
-
-  it('同時刻の予約数を取得', async () => {
-    const logger = createLogger('integration-test');
-    const client = new SheetsClient(logger);
-
-    const count = await client.findAvailability('2025-01-25', '18:00');
-
-    expect(count).toBeGreaterThanOrEqual(0);
-  }, 10000);
+void main().catch((error) => {
+  logger.error({ err: error }, 'Failed to provision sheet');
+  process.exit(1);
 });
 ```
 
 **完了条件**:
-- `tests/integration/sheets-api.test.ts` が作成されている
-- `npm exec vitest run implementation/tests/integration/sheets-api.test.ts` が成功（実Sheets使用）
+- `scripts/create-customer-sheet.ts` が作成されている
+- CLI 経由でシート生成と共有が行える
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
 
-**備考**: 統合テストは実際のGoogle Sheetsを使用するため、CI環境ではスキップ可能にする（`--skip-integration` フラグなど）
-
 ---
 
-### Task 10: README.md 更新
+### Task 10: ops/customers/customers.json 作成
 
-**前提タスク**: Task 7, Task 8
-**対象ファイル**: `implementation/README.md`
+**前提タスク**: Task 9  
+**対象ファイル**: `implementation/ops/customers/customers.json`  
 **作業内容**:
-Phase2 のセットアップ手順を追記:
-```markdown
-## Phase 2: Google Sheets 連携
-
-### セットアップ
-
-1. Google Cloud プロジェクト作成
-2. Sheets API 有効化
-3. サービスアカウント作成・JSON鍵ダウンロード
-4. 対象スプレッドシート作成
-5. スプレッドシートをサービスアカウントと共有（編集権限）
-
-### 環境変数設定
-
-```bash
-# .env に追記
-GOOGLE_SA_KEY='{"type":"service_account",...}'
-GOOGLE_SHEET_ID=<spreadsheet_id>
+- 顧客IDと生成済みスプレッドシートIDを管理するJSONファイルを作成
+- フォーマット例:
+```json
+[
+  {
+    "customerId": "store-a",
+    "spreadsheetId": "1abc...",
+    "url": "https://docs.google.com/spreadsheets/d/1abc..."
+  }
+]
 ```
-
-### テストスクリプト
-
-```bash
-# 書き込みテスト
-npm exec tsx implementation/scripts/test-sheets-write.ts
-
-# 読み込みテスト
-npm exec tsx implementation/scripts/test-sheets-read.ts
-```
-
-### 統合テスト
-
-```bash
-# Sheets API統合テスト（実APIを使用）
-npm exec vitest run implementation/tests/integration/sheets-api.test.ts
-```
-```
+- 生成スクリプトがこのファイルを追記更新できるようにする
 
 **完了条件**:
-- `README.md` が更新されている
-- Phase2 のセットアップ手順が記載されている
+- `implementation/ops/customers/customers.json` が作成されている
+- JSON構造が上記フォーマットで初期化されている（空配列で可）
 - state.md が `done` に更新
 
 **state.md遷移**: coding → pr_preparation → review → integration → done
 
 ---
 
-### Task 11: docs/howto/google-sheets-setup.md 作成
+### Task 11: ops/customers/provision-customers.ts 作成
 
-**前提タスク**: Task 1
+**前提タスク**: Task 9, Task 10  
+**対象ファイル**: `implementation/ops/customers/provision-customers.ts`  
+**作業内容**:
+- `customers.json` を読み込み、未登録の顧客に対して `create-customer-sheet.ts` 相当の処理を行い、生成結果を追記
+- CLI オプションで `--share` メールを受け付け、共有設定を自動化
+- 既存エントリに対してはスキップするロジックを実装
+
+**完了条件**:
+- `provision-customers.ts` が作成されている
+- 指定した顧客リストに対し、シート生成と `customers.json` 更新がワンコマンドで実行できる
+- state.md が `done` に更新
+
+**state.md遷移**: coding → pr_preparation → review → integration → done
+
+---
+
+
+
+### Task 12: scripts/test-sheets-write.ts 作成
+
+**前提タスク**: Task 3, Task 5, Task 7, Task 10
+**対象ファイル**: `implementation/scripts/test-sheets-write.ts`
+**作業内容**:
+- `--sheet-id` または `--customer-id` オプションで書き込み先シートを指定
+- `customers.json` から自動的にシートIDを解決するロジックを追加
+- 予約データを1件書き込み、結果をログ出力
+
+**完了条件**:
+- CLI 実行がオプション経由でシートIDを解決し、書き込みが成功する
+- state.md が `done` に更新
+
+**state.md遷移**: coding → pr_preparation → review → integration → done
+
+---
+
+### Task 13: scripts/test-sheets-read.ts 作成
+
+**前提タスク**: Task 3, Task 7, Task 10
+**対象ファイル**: `implementation/scripts/test-sheets-read.ts`
+**作業内容**:
+- `--sheet-id` / `--customer-id` オプションでシートIDを解決
+- 予約データを取得し、件数と内容をログ・標準出力へ表示
+
+**完了条件**:
+- CLI 実行で対象シートのデータが取得できる
+- state.md が `done` に更新
+
+**state.md遷移**: coding → pr_preparation → review → integration → done
+
+---
+
+### Task 14: docs/howto/google-sheets-setup.md 作成
+
+**前提タスク**: Task 1, Task 7
 **対象ファイル**: `implementation/docs/howto/google-sheets-setup.md`
 **作業内容**:
 Google Sheets セットアップガイドを作成:
@@ -778,12 +892,14 @@ Google Sheets セットアップガイドを作成:
 ```bash
 # .env に追記
 GOOGLE_SA_KEY='<JSON鍵の内容を1行に>'
+GOOGLE_SHEET_PARENT_FOLDER_ID='<Drive フォルダ ID>'
+# 既存シートを手動で用意する場合のみ設定
 GOOGLE_SHEET_ID='<スプレッドシートのID（URLから取得）>'
 ```
 
-**スプレッドシートIDの取得方法**:
-URL: `https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit`
-→ `{SHEET_ID}` 部分をコピー
+**スプレッドシート/フォルダ ID の取得方法**:
+- シート: `https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit` の `{SHEET_ID}` をコピー
+- フォルダ: `https://drive.google.com/drive/folders/{FOLDER_ID}` の `{FOLDER_ID}` をコピー
 
 ## トラブルシューティング
 
@@ -792,11 +908,10 @@ URL: `https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit`
 - スプレッドシートがサービスアカウントと共有されているか確認
 - 権限が「編集者」になっているか確認
 
-### 429 Too Many Requests エラー
+### 自動プロビジョニング
 
-- レート制限に達しています
-- 自動的に指数バックオフでリトライします
-- 1分待機してから再試行してください
+- `scripts/create-customer-sheet.ts` を実行すると、フォルダ内にテンプレートなしシートが作成され共有設定が自動化されます
+- 生成結果の `spreadsheetId` を `.env.local` の `GOOGLE_SHEET_ID` に転記するか、アプリケーション設定ストアに保存してください
 ```
 
 **完了条件**:
@@ -808,9 +923,9 @@ URL: `https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit`
 
 ---
 
-### Task 12: docs/notes/phase2.md 作成
+### Task 15: docs/notes/phase2.md 作成
 
-**前提タスク**: Task 9
+**前提タスク**: Task 12
 **対象ファイル**: `implementation/docs/notes/phase2.md`
 **作業内容**:
 Phase2 完了報告を作成:
@@ -863,6 +978,7 @@ Phase2 完了報告を作成:
 
 - [ ] 全12タスクが `done` ステータスに到達
 - [ ] `npm test` が成功
+- [ ] `npm exec tsx implementation/scripts/create-customer-sheet.ts -- --name Sample --customer-id sample` が成功（シート自動生成）
 - [ ] `npm exec tsx implementation/scripts/test-sheets-write.ts` が成功（実Sheets書き込み）
 - [ ] `npm exec tsx implementation/scripts/test-sheets-read.ts` が成功（実Sheets読み込み）
 - [ ] `npm exec vitest run implementation/tests/integration/sheets-api.test.ts` が成功
