@@ -11,6 +11,11 @@ type RealtimeClientLike = EventEmitter & {
   on(event: 'response.done', listener: (payload: unknown) => void): this;
 };
 
+type LocalOrchestratorListeners = {
+  onAiAudioChunk?: (delta: Buffer) => void;
+  onAiResponseDone?: (event: unknown) => void;
+};
+
 export class LocalOrchestrator {
   private readonly correlationId = randomUUID();
   private startTime = 0;
@@ -23,7 +28,8 @@ export class LocalOrchestrator {
     private readonly audioSource: IAudioSource,
     private readonly audioSink: IAudioSink,
     private readonly logger: Logger,
-    private readonly autoStopOnDone = false
+    private readonly autoStopOnDone = false,
+    private readonly listeners: LocalOrchestratorListeners = {}
   ) {}
 
   async start(): Promise<void> {
@@ -49,6 +55,7 @@ export class LocalOrchestrator {
         this.logger.info({ correlationId: this.correlationId }, 'AI started speaking - pausing microphone');
       }
       this.audioSink.write(delta);
+      this.listeners.onAiAudioChunk?.(delta);
     });
 
     this.realtimeClient.on('response.done', (event: unknown) => {
@@ -57,6 +64,8 @@ export class LocalOrchestrator {
         this.isAiSpeaking = false;
         this.logger.info({ correlationId: this.correlationId }, 'AI finished speaking - resuming microphone');
       }
+
+      this.listeners.onAiResponseDone?.(event);
 
       if (this.autoStopOnDone) {
         this.logger.info(

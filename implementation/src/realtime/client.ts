@@ -18,6 +18,57 @@ type RealtimeConnection = {
   close(): Promise<void>;
 };
 
+type TurnDetectionConfig = {
+  type: string;
+  threshold?: number;
+  prefix_padding_ms?: number;
+  silence_duration_ms?: number;
+  [key: string]: unknown;
+};
+
+type InputAudioTranscriptionConfig = {
+  model: string;
+  [key: string]: unknown;
+};
+
+export type SessionConfiguration = {
+  instructions: string;
+  voice?: string;
+  input_audio_format?: string;
+  output_audio_format?: string;
+  input_audio_transcription?: InputAudioTranscriptionConfig;
+  turn_detection?: TurnDetectionConfig;
+  [key: string]: unknown;
+};
+
+const DEFAULT_SESSION_CONFIGURATION: SessionConfiguration = {
+  instructions: `あなたは日本国内の飲食店「レストラン桜」の電話予約受付AIアシスタントです。
+
+会話の最初に、必ず以下のように挨拶してください：
+「お電話ありがとうございます。レストラン桜でございます。ご予約のお電話でしょうか？」
+
+その後、丁寧で親しみやすい口調で、以下の情報を順番に確認してください：
+1. お客様のお名前
+2. 予約日時（日付と時間）
+3. 人数
+4. その他のご要望（コース料理、アレルギー、席の希望など）
+
+すべての情報を確認したら、予約内容を復唱して確認をお願いします。
+日本語で自然な会話を心がけてください。`,
+  voice: 'alloy',
+  input_audio_format: 'pcm16',
+  output_audio_format: 'pcm16',
+  input_audio_transcription: {
+    model: 'whisper-1',
+  },
+  turn_detection: {
+    type: 'server_vad',
+    threshold: 0.6,
+    prefix_padding_ms: 300,
+    silence_duration_ms: 1000,
+  },
+};
+
 async function connectRealtimeSocket(apiKey: string, model: string): Promise<RealtimeConnection> {
   const client = new OpenAI({ apiKey });
   const socket = new OpenAIRealtimeWS({ model }, client);
@@ -71,13 +122,16 @@ export class RealtimeClient extends EventEmitter {
   private audioChunkCount = 0;
   private commitTimer: ReturnType<typeof setTimeout> | null = null;
   private hasBufferedAudio = false;
+  private readonly sessionConfig: SessionConfiguration;
 
   constructor(
     private readonly apiKey: string,
     private readonly model: string,
-    private readonly logger: Logger
+    private readonly logger: Logger,
+    sessionConfig: SessionConfiguration = DEFAULT_SESSION_CONFIGURATION
   ) {
     super();
+    this.sessionConfig = sessionConfig;
   }
 
   async start(): Promise<void> {
@@ -100,44 +154,17 @@ export class RealtimeClient extends EventEmitter {
     );
   }
 
-  private configureJapaneseSession(): void {
+  private configureSession(): void {
     if (!this.connection) {
       return;
     }
 
-    // Configure session for Japanese restaurant reservation AI
     this.connection.send({
       type: 'session.update',
-      session: {
-        instructions: `あなたは日本国内の飲食店「レストラン桜」の電話予約受付AIアシスタントです。
-
-会話の最初に、必ず以下のように挨拶してください：
-「お電話ありがとうございます。レストラン桜でございます。ご予約のお電話でしょうか？」
-
-その後、丁寧で親しみやすい口調で、以下の情報を順番に確認してください：
-1. お客様のお名前
-2. 予約日時（日付と時間）
-3. 人数
-4. その他のご要望（コース料理、アレルギー、席の希望など）
-
-すべての情報を確認したら、予約内容を復唱して確認をお願いします。
-日本語で自然な会話を心がけてください。`,
-        voice: 'alloy',
-        input_audio_format: 'pcm16',
-        output_audio_format: 'pcm16',
-        input_audio_transcription: {
-          model: 'whisper-1',
-        },
-        turn_detection: {
-          type: 'server_vad',
-          threshold: 0.6,            // Higher = less sensitive to noise (0.0-1.0)
-          prefix_padding_ms: 300,    // Audio before speech starts
-          silence_duration_ms: 1000, // How long silence before turn ends (1 second)
-        },
-      },
+      session: { ...this.sessionConfig },
     });
 
-    this.logger.info('Japanese session configured');
+    this.logger.info('Realtime session configured');
 
     // Request initial greeting
     this.connection.send({
@@ -197,7 +224,7 @@ export class RealtimeClient extends EventEmitter {
     }
 
     this.connection.once('session.created', () => {
-      this.configureJapaneseSession();
+      this.configureSession();
     });
   }
 

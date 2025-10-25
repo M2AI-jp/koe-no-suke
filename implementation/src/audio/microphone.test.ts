@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ChildProcess } from 'child_process';
 import { EventEmitter } from 'events';
+import { createTestLogger } from '../../tests/helpers/testLogger';
 
 class MockChildProcess extends EventEmitter {
   stdout = new EventEmitter();
@@ -19,12 +20,6 @@ const spawnMock = vi.fn(() => mockProcess);
 vi.mock('child_process', () => ({
   spawn: spawnMock,
 }));
-
-const createTestLogger = async () => {
-  vi.stubEnv('OPENAI_API_KEY', 'test-key');
-  const { createLogger } = await import('../logger');
-  return createLogger('test');
-};
 
 beforeEach(() => {
   mockProcess = new MockChildProcess();

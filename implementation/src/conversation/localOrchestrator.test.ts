@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Logger } from 'pino';
 import type { IAudioSink, IAudioSource } from '../audio';
+import { createTestLogger } from '../../tests/helpers/testLogger';
 
 const startMock = vi.fn();
 const stopMock = vi.fn();
@@ -23,12 +23,6 @@ vi.mock('../realtime/client', () => ({
     return instance;
   }),
 }));
-
-const createTestLogger = async (): Promise<Logger> => {
-  vi.stubEnv('OPENAI_API_KEY', 'test-key');
-  const { createLogger } = await import('../logger');
-  return createLogger('test');
-};
 
 class TestAudioSource implements IAudioSource {
   private handler: ((chunk: Buffer) => void) | null = null;

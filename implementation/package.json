@@ -11,6 +11,8 @@
   "dependencies": {
     "commander": "^12.1.0",
     "dotenv": "^17.2.3",
+    "google-auth-library": "^9.0.0",
+    "googleapis": "^136.0.0",
     "openai": "^4.81.0",
     "p-retry": "^6.2.0",
     "pino": "^9.2.0",
