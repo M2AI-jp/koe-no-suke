@@ -86,7 +86,7 @@ interface Reservation {
 
 ## 3. タスク依存関係
 
-```
+```text
 Phase1完了
   ↓
 Task 1 (google/auth.ts) ← Phase1
@@ -161,7 +161,7 @@ export function getSheetsClient() {
 **state.md遷移**: coding → pr_preparation → review → integration → done
 
 **備考**: `.env.template` に以下を追記:
-```
+```text
 GOOGLE_SA_KEY=
 GOOGLE_SHEET_ID=
 ```
@@ -764,7 +764,7 @@ Google Sheets セットアップガイドを作成:
 3. 1行目にヘッダー追加:
    ```
    timestamp_iso | caller_number | transcript_log | reservation_date | reservation_time | party_size | customer_name | contact_number | special_request | status
-   ```
+   ```text
 
 ## 6. スプレッドシート共有
 

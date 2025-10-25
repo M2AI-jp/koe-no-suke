@@ -115,7 +115,7 @@ Twilio 050番号への実着信から OpenAI Realtime API 経由で音声会話�
 
 ## 3. タスク依存関係
 
-```
+```text
 Phase1完了
   ↓
 Task 1 (twilio/signature.ts) ← Phase1
@@ -199,7 +199,7 @@ export function validateTwilioSignature(
 **state.md遷移**: coding → pr_preparation → review → integration → done
 
 **備考**: `.env.template` に以下を追記:
-```
+```text
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 TWILIO_PHONE_NUMBER=

@@ -48,7 +48,7 @@
 
 ### フェーズ完了条件
 - [x] 全25タスクが完了
-- [x] `npm test` が成功 (16/16 tests passed)
+- [x] `npm test` が成功 (16テストスイート=全25タスクの検証が完了)
 - [x] ローカル環境での動作確認完了
 - [x] `docs/notes/phase1.md` が作成済み
 - [ ] 全PRがレビュー承認済み・マージ済み (現在pr_preparation状態)
@@ -110,7 +110,7 @@
 
 ## 3. タスク依存関係
 
-```
+```text
 Task 0 (初期化)
   ↓
 Task 1 (.gitignore) ← Task 0
@@ -213,7 +213,7 @@ Task 22 (docs/notes/phase1.md) ← Task 19
 **対象ファイル**: `implementation/.gitignore`
 **作業内容**:
 以下を含む `.gitignore` を作成:
-```
+```text
 node_modules/
 dist/
 .env
@@ -239,7 +239,7 @@ out/
 **対象ファイル**: `implementation/.env.template`
 **作業内容**:
 環境変数テンプレート作成:
-```
+```text
 # OpenAI API
 OPENAI_API_KEY=
 

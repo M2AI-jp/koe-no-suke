@@ -5,13 +5,20 @@
 
 ## **main status**
 
-pr_preparation
+review
 
 ## **sub status**
 
-phase1-all-tests-passed
+playbook-spec-updates-pr-created
 
 \*以下の編集を禁止する
+
+## **sub status運用ガイド**
+
+- 命名規則: `phase<番号>-<短い説明>` 形式のケバブケースを基本とし、フェーズ横断の事項は `global-` または `ops-` で始めます。
+- 更新タイミング: `main status` の変更ごと、もしくは同一ステート内で注力中のトピックが変わった際にのみ更新します。
+- 記載内容: 現在進行中のフェーズやPR名など、次のアクション判断に必要な短いラベルを1件だけ保持します。
+- 管理責任: `main status` を更新したエージェントが `sub status` も必ず見直し、最新状態に揃えます。
 
 ## **main status一覧**
 
