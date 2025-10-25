@@ -1,0 +1,147 @@
+# restaurant-voice-ai プロジェクト制約定義
+# AIエージェント実装支援用ガードレール
+# 最終更新: 2025-01-24
+
+project:
+  name: restaurant-voice-ai
+  description: 日本国内飲食店向け電話予約受付AIシステム
+  goal: Twilio電話着信 → OpenAI音声応答 → Googleスプレッドシート記録
+
+# 選定済み技術（これを使う）
+technology_stack:
+  primary_choice: TypeScript + Node.js 20 LTS
+  alternative: Python 3.11+ FastAPI
+
+  if_typescript:
+    http_server: Fastify v5 (v4は2025年6月30日EOL)
+    websocket: ws
+    openai_sdk: openai v4.81.0+ (import { OpenAIRealtimeWS } from 'openai/beta/realtime/websocket')
+    google_sdk: googleapis
+    retry: p-retry
+    test: vitest or jest
+    logging: pino
+
+  if_python:
+    http_server: FastAPI v0.119.1+
+    websocket: FastAPI WebSocket / websockets
+    openai_sdk: openai v1.x
+    google_sdk: google-auth + google-api-python-client
+    retry: tenacity
+    test: pytest + pytest-asyncio
+    logging: structlog
+
+# 外部サービス制約（これを守る）
+external_services:
+  twilio:
+    phone_number: 050番号（日本）
+    audio_format: mulaw 8kHz、base64エンコード
+    protocol: WebSocket Secure (WSS)
+    webhook_security: X-Twilio-Signature検証必須
+    integration_options:
+      - Media Streams（自前WebSocket実装、推奨初期）
+      - AiSession TwiML（パイロット版、申請必要）
+
+  openai:
+    model: gpt-realtime-2025-08-28 (GA版)
+    latency: 200ms以下
+    constraint: 5分超の通話でレイテンシー劣化の可能性
+    cost: $32/1M input tokens, $64/1M output tokens
+    optimization: Prompt Caching活用で最大90%削減
+
+  google_sheets:
+    rate_limits:
+      read: 300 req/min/project
+      write: 500 req/100s/project
+      per_user: 60 req/min/user/project
+    error_handling: 429エラー時は指数バックオフ必須
+    quota_refresh: 毎分自動リフィル
+
+  gcp_cloud_run:
+    websocket_timeout_max: 3600秒（60分）
+    recommended_timeout: 3600秒（予約通話は3-5分だが余裕持たせる）
+    region: asia-northeast1（東京）
+    concurrency: 1-2（音声遅延対策）
+
+# データ構造（これを扱う）
+data_models:
+  reservation:
+    timestamp_iso: ISO8601文字列（UTC）
+    caller_number: E.164形式
+    transcript_log: 会話全文（オプション）
+    reservation_date: YYYY-MM-DD
+    reservation_time: HH:MM
+    party_size: 数値
+    customer_name: 文字列
+    contact_number: 文字列
+    special_request: 文字列（オプション）
+    status: accepted | pending | manual
+
+  restaurant_info:
+    name: 文字列
+    business_hours: 配列（open/close）
+    closed_days: 配列
+    max_capacity: 数値
+
+# 段階的テスト戦略（これに従う）
+testing_phases:
+  phase_1:
+    name: ローカル音声処理
+    real_services: [openai]
+    mocked_services: [twilio, google_sheets]
+    goal: OpenAI Realtime API接続・Function Calling動作確認
+
+  phase_2:
+    name: Sheets連携
+    real_services: [google_sheets]
+    mocked_services: [openai, twilio]
+    goal: レート制限・リトライロジック確認
+
+  phase_3:
+    name: Twilio統合
+    real_services: [twilio, openai]
+    mocked_services: [google_sheets]
+    goal: 実電話 → AI応答確認、統合方式選択
+
+  phase_4:
+    name: E2E統合
+    real_services: [twilio, openai, google_sheets]
+    mocked_services: []
+    goal: 本番同等環境で全フロー確認
+
+# 制約・考慮事項（これに注意）
+constraints:
+  security:
+    - Twilio Webhook署名検証必須（HMAC-SHA1）
+    - APIキーはSecret Manager経由で注入
+    - WebSocket通信はWSS（TLS 1.2+）のみ
+    - PII含む会話ログ、GDPR/個人情報保護法対応
+
+  performance:
+    - エンドツーエンドレイテンシー目標: 800ms以内
+    - Cloud Runコンカレンシー: 1-2
+
+  cost:
+    - 1通話あたり: ¥200-350/通話（5分想定）
+    - OpenAI: ¥150-300
+    - Twilio: ¥50-75
+
+  reliability:
+    - Google Sheets API 429エラー対策必須
+    - OpenAI/Twilio API障害時のフォールバック
+    - 営業時間外の自動応答分岐
+
+# 参考資料（必要時に参照）
+references:
+  - https://www.twilio.com/en-us/blog/twilio-openai-realtime-api-launch-integration
+  - https://openai.com/index/introducing-gpt-realtime/
+  - https://www.twilio.com/docs/voice/media-streams
+  - https://developers.google.com/sheets/api/limits
+  - https://cloud.google.com/run/docs/triggering/websockets
+
+# 成功指標（これを達成）
+success_metrics:
+  - 予約成功率: 95%以上
+  - レイテンシー: 1秒以内
+  - 音声認識精度: 90%以上（日本語）
+  - システム稼働率: 99.9%
+  - コスト: ¥350以下/通話
